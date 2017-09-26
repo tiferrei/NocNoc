@@ -19,19 +19,55 @@ import AVKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var builtInLabel: UILabel!
+    @IBOutlet weak var headsetLabel: UILabel!
+    @IBOutlet weak var lineInLabel: UILabel!
     @IBOutlet weak var testButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         testButton.layer.cornerRadius = 5
+        builtInLabel.text = "Built In Microphone: Unknown"
+        headsetLabel.text = "Headset (Jack) Microphone: Unknown"
+        lineInLabel.text = "Line In (Dock) Microphone: Unknown"
     }
 
     @IBAction func buttonPressed(_ sender: Any) {
+        var builtInDetected = false
+        var headsetDetected = false
+        var lineInDetected = false
+
         let session = AVAudioSession.sharedInstance()
         _ = try? session.setCategory(AVAudioSessionCategoryRecord, with: [])
         for input in AVAudioSession.sharedInstance().availableInputs! {
-            print("Port Type: \(input.portType)")
-            print("Port Name: \(input.portName)")
+            switch input.portType {
+            case "MicrophoneBuiltIn":
+                builtInDetected = true
+            case "MicrophoneWired":
+                headsetDetected = true
+            case "LINE IN DOCK":
+                lineInDetected = true
+            default:
+                print("Detected new device: \(input.portType)")
+            }
+        }
+
+        if builtInDetected {
+            builtInLabel.text = "Built In Microphone: Detected"
+        } else {
+            builtInLabel.text = "Built In Microphone: Undetected"
+        }
+
+        if headsetDetected {
+            headsetLabel.text = "Headset (Jack) Microphone: Detected"
+        } else {
+            headsetLabel.text = "Headset (Jack) Microphone: Undetected"
+        }
+
+        if lineInDetected {
+            lineInLabel.text = "Line In (Dock) Microphone: Detected"
+        } else {
+            lineInLabel.text = "Line In (Dock) Microphone: Undetected"
         }
     }
 }
